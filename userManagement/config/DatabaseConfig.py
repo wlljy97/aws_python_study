@@ -11,7 +11,7 @@ class DataBaseConfig:
         password = "1q2w3e4r"
         database = "python_study"
 
-        return pymysql.connect( # database에 연결시키는 함수
+        return pymysql.connect(  # database에 연결시키는 함수
             host=host,
             port=port,
             user=user,

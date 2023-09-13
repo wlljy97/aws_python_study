@@ -66,21 +66,63 @@ class UserRepository:
                 print(e)
                 return None
 
-if __name__ == "__main__":
-    userList = UserRepository.getUsersAll()
-    print(userList)
+    @staticmethod
+    def updateUser(user=None):
+        try:
+            connection = DataBaseConfig.getConnection()
+            cursor = connection.cursor(pymysql.cursors.DictCursor)
+            sql = """
+            update user_tb
+            set
+               password = %s,
+               name = %s,
+               email = %s
+            where
+               user_id = %s
+            """
+            updateCount = cursor.execute(sql,
+                        (user.get("password"), user.get("name"), user.get("email"), user.get("userId")))
+            connection.commit()
+            return updateCount
+        except Exception as e:
+            print(e)
+            return 0
 
-    data = {
-        "userId": [1, 2, 3],
-        "username": ["aaa", "bbb", "ccc"],
-        "password": ["1234", "1111", "2222"],
-        "name": ["aaa", "bbb", "ccc"],
-        "email": ["aaa@gmail.com", "bbb@gmail.com", "ccc@gmail.com"]
-    }
+    @staticmethod
+    def deleteUser(user=None):
+        try:
+            connection = DataBaseConfig.getConnection()
+            cursor = connection.cursor(pymysql.cursors.DictCursor)
+            sql = """
+            delete from
+                user_tb
+            where
+                user_id
+            """
+            deleteCount = cursor.execute(sql,
+                        (user.get("password"), user.get("name"), user.get("email"), user.get("userId")))
+            connection.commit()
+            return deleteCount
+        except Exception as e:
+            print(e)
+            return 0
 
-    # print(pd.Series(userList)) # 딕셔너리에 넣는다.
-    df = pd.DataFrame(userList)
-    print(df)
+
+# if __name__ == "__main__":
+#     userList = UserRepository.getUsersAll()
+#     print(userList)
+#
+#     data = {
+#         "userId": [1, 2, 3],
+#         "username": ["aaa", "bbb", "ccc"],
+#         "password": ["1234", "1111", "2222"],
+#         "name": ["aaa", "bbb", "ccc"],
+#         "email": ["aaa@gmail.com", "bbb@gmail.com", "ccc@gmail.com"]
+#     }
+#
+#     # print(pd.Series(userList)) # 딕셔너리에 넣는다.
+#     df = pd.DataFrame(userList)
+#     print(df)
 
 
 # fetchAll 다 가져옴

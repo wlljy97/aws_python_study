@@ -63,25 +63,36 @@ class UserView:
             print("수정할 사용자 정보가 없습니다.")
             return
         df = pd.DataFrame(response.body)
-        print()
+        print(df)
         userId = input("수정하실 userId를 입력하세요 >>> ")
         index = df.index[df["userId"] == int(userId)].values[0]
-        print(df.iloc[index])
-        print()
-        UserView.showUpdateMenu(response.body[index])
+        user = UserView.showUpdateMenu(response.body[index])
+        if not bool(user):
+            print("수정을 취소하였습니다.")
+            return
+
+        response = UserController.updateUser(user)
+        if(bool(response.body)):
+            print("=======<< 수정완료 >>=======")
 
     # loc 데이터프레임에서 사용됨, 찾고자 하는 조건
     # iloc index값을 찾음
 
     @staticmethod
     def showUpdateMenu(oldUser):
-        newUser = User()
+        newUser = oldUser.copy()
+
         while True:
+            print("-" * 50)
+            df = pd.DataFrame([oldUser, newUser], index=["수정 전", "수정 후"])
+            print(df)
+            print("-" * 50)
             print("1. password 수정")
             print("2. name 수정")
             print("3. email 수정")
             print("s. 저장")
             print("c. 취소")
+            print("-" * 50)
             select = input("메뉴 선택 >>> ")
 
             if select == "c":
@@ -89,12 +100,63 @@ class UserView:
             elif select == "s":
                 return newUser
             elif select == "1":
-                pass
+                password = input("비밀번호 입력 >>> ")
+
+                if not UserView.isValid(oldUser.get("password"), password):
+                    continue
+
+                checkPassword = input("비밀번호 확인 입력 >>> ")
+
+                if checkPassword != password:
+                    print("비밀번호가 일치하지 않습니다.")
+                    continue
+
+                newUser["password"] = password
+
             elif select == "2":
-                pass
+                name = input("이름 입력 >>> ")
+
+                if not UserView.isValid(oldUser.get("name"), name):
+                    continue
+
+                newUser["name"] = name
+
             elif select == "3":
-                pass
+                email = input("이메일 입력 >>> ")
+
+                if not UserView.isValid(oldUser.get("email"), email):
+                    continue
+
+                newUser["email"] = email
             else:
                 print("선택하신 번호는 등록되지 않은 메뉴입니다.")
+            print()
 
         return None
+
+    @staticmethod
+    def isValid(oldValue, value):
+        if not bool(value):
+            print("공백일 수 없습니다.")
+            return False
+        elif oldValue == value:
+            print("기존의 정보와 동일합니다.")
+            return False
+
+        return True
+
+    @staticmethod
+    def deleteUser():
+        print("[ 사용자 정보 삭제 ]")
+        response = UserController.getUsersAll()
+        if not bool(response.body):
+            print("삭제할 사용자 정보가 없습니다.")
+            return
+        df = pd.DataFrame(response.body)
+        print(df)
+        userId = input("삭제하실 userId를 입력하세요 >>> ")
+        index = df.index[df["userId"] == int(userId)].values[0]
+        user = UserView.showUpdateMenu(response.body[index])
+        if not bool(user):
+            print("삭제를 취소하였습니다.")
+            return
