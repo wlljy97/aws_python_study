@@ -155,8 +155,16 @@ class UserView:
         df = pd.DataFrame(response.body)
         print(df)
         userId = input("삭제하실 userId를 입력하세요 >>> ")
-        index = df.index[df["userId"] == int(userId)].values[0]
-        user = UserView.showUpdateMenu(response.body[index])
-        if not bool(user):
-            print("삭제를 취소하였습니다.")
+        if int(userId) not in df['userId'].values:
+            print("입력한 userId가 존재하지 않습니다.")
             return
+
+        confirm = input(f"userId {userId}를 삭제하시겠습니까? (y/n): ")
+        if confirm.lower() == 'y':
+            response = UserController.deleteUser({"userId": int(userId)})
+            if bool(response.body):
+                print(f"userId {userId}가 성공적으로 삭제되었습니다.")
+            else:
+                print("삭제하는 중 오류가 발생하였습니다.")
+        else:
+            print("삭제를 취소하였습니다.")

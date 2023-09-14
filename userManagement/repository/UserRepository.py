@@ -97,10 +97,10 @@ class UserRepository:
             delete from
                 user_tb
             where
-                user_id
+                user_id = %s
             """
             deleteCount = cursor.execute(sql,
-                        (user.get("password"), user.get("name"), user.get("email"), user.get("userId")))
+                        (user.get("userId")))
             connection.commit()
             return deleteCount
         except Exception as e:
